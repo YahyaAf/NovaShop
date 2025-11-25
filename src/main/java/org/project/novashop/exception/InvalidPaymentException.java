@@ -1,0 +1,7 @@
+package org.project.novashop.exception;
+
+public class InvalidPaymentException extends RuntimeException {
+    public InvalidPaymentException(String message) {
+        super(message);
+    }
+}
