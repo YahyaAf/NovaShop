@@ -8,7 +8,6 @@ import org.project.novashop.exception.ResourceNotFoundException;
 import org.project.novashop.mapper.UserMapper;
 import org.project.novashop.model.User;
 import org.project.novashop.repository.UserRepository;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,14 +20,11 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
-    private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, UserMapper userMapper) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
-        this.passwordEncoder = passwordEncoder;
     }
-
 
     @Transactional
     public ApiResponse<UserResponseDto> create(UserRequestDto requestDto) {
@@ -36,9 +32,7 @@ public class UserService {
             throw new DuplicateResourceException("User", "username", requestDto.getUsername());
         }
 
-        String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
-        User user = userMapper.toEntity(requestDto, encodedPassword);
-
+        User user = userMapper.toEntity(requestDto);
         User savedUser = userRepository.save(user);
         UserResponseDto responseDto = userMapper.toResponseDto(savedUser);
 
@@ -86,12 +80,7 @@ public class UserService {
             throw new DuplicateResourceException("User", "username", requestDto.getUsername());
         }
 
-        String encodedPassword = null;
-        if (requestDto.getPassword() != null && !requestDto.getPassword().isEmpty()) {
-            encodedPassword = passwordEncoder.encode(requestDto.getPassword());
-        }
-
-        userMapper.updateEntityFromDto(requestDto, user, encodedPassword);
+        userMapper.updateEntityFromDto(requestDto, user);
         User updatedUser = userRepository.save(user);
         UserResponseDto responseDto = userMapper.toResponseDto(updatedUser);
 
