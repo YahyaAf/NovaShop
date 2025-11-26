@@ -1,12 +1,11 @@
-package org.project.novashop.exception;
+package org.project.novashop. exception;
 
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet. http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
-import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework. http.ResponseEntity;
+import org.springframework.web.bind. MethodArgumentNotValidException;
+import org.springframework.web.bind. annotation.ExceptionHandler;
+import org.springframework.web.bind. annotation.RestControllerAdvice;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -19,7 +18,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex,
                                                                 HttpServletRequest request) {
         ErrorResponse error = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
+                . timestamp(LocalDateTime.now())
                 .status(HttpStatus.NOT_FOUND.value())
                 .error("Resource Not Found")
                 .message(ex.getMessage())
@@ -33,8 +32,8 @@ public class GlobalExceptionHandler {
                                                                  HttpServletRequest request) {
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.CONFLICT.value())
-                .error("Duplicate Resource")
+                .status(HttpStatus. CONFLICT.value())
+                . error("Duplicate Resource")
                 .message(ex.getMessage())
                 .path(request.getRequestURI())
                 .build();
@@ -45,10 +44,10 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex,
                                                             HttpServletRequest request) {
         ErrorResponse error = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
-                .status(HttpStatus.FORBIDDEN.value())
+                . timestamp(LocalDateTime.now())
+                .status(HttpStatus. FORBIDDEN.value())
                 .error("Access Denied")
-                .message(ex.getMessage())
+                . message(ex.getMessage())
                 .path(request.getRequestURI())
                 .build();
         return new ResponseEntity<>(error, HttpStatus.FORBIDDEN);
@@ -60,7 +59,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.BAD_REQUEST.value())
-                .error("Insufficient Stock")
+                . error("Insufficient Stock")
                 .message(ex.getMessage())
                 .path(request.getRequestURI())
                 .build();
@@ -72,7 +71,7 @@ public class GlobalExceptionHandler {
                                                                 HttpServletRequest request) {
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus. BAD_REQUEST.value())
                 .error("Invalid Operation")
                 .message(ex.getMessage())
                 .path(request.getRequestURI())
@@ -84,20 +83,20 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleInvalidPayment(InvalidPaymentException ex,
                                                               HttpServletRequest request) {
         ErrorResponse error = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
+                .timestamp(LocalDateTime. now())
                 .status(HttpStatus.BAD_REQUEST.value())
                 .error("Invalid Payment")
-                .message(ex.getMessage())
+                .message(ex. getMessage())
                 .path(request.getRequestURI())
                 .build();
-        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error, HttpStatus. BAD_REQUEST);
     }
 
     @ExceptionHandler(BusinessRuleException.class)
     public ResponseEntity<ErrorResponse> handleBusinessRule(BusinessRuleException ex,
                                                             HttpServletRequest request) {
         ErrorResponse error = ErrorResponse.builder()
-                .timestamp(LocalDateTime.now())
+                .timestamp(LocalDateTime. now())
                 .status(HttpStatus.UNPROCESSABLE_ENTITY.value())
                 .error("Business Rule Violation")
                 .message(ex.getMessage())
@@ -127,29 +126,31 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(IllegalArgumentException.class)
+    @ExceptionHandler(IllegalArgumentException. class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex,
                                                                HttpServletRequest request) {
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus. BAD_REQUEST.value())
                 .error("Invalid Argument")
                 .message(ex.getMessage())
-                .path(request.getRequestURI())
-                .build();
+                .path(request. getRequestURI())
+                . build();
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
+    @ExceptionHandler(Exception. class)
     public ResponseEntity<ErrorResponse> handleGenericException(Exception ex,
                                                                 HttpServletRequest request) {
+        ex.printStackTrace();
+
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
-                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .status(HttpStatus. INTERNAL_SERVER_ERROR.value())
                 .error("Internal Server Error")
-                .message("Une erreur interne est survenue")
+                .message(ex.getMessage())
                 .path(request.getRequestURI())
                 .build();
-        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(error, HttpStatus. INTERNAL_SERVER_ERROR);
     }
 }
