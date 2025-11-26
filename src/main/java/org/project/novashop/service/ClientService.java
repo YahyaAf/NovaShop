@@ -79,16 +79,27 @@ public class ClientService {
                 .orElseThrow(() -> new ResourceNotFoundException("Client", id));
 
         if (! client.getTelephone().equals(requestDto.getTelephone()) &&
-                clientRepository.existsByTelephone(requestDto.getTelephone())) {
+                clientRepository.existsByTelephone(requestDto. getTelephone())) {
             throw new DuplicateResourceException("Client", "telephone", requestDto.getTelephone());
         }
 
         clientMapper.updateEntityFromDto(requestDto, client);
 
-        Client updatedClient = clientRepository.save(client);
-        ClientResponseDto responseDto = clientMapper.toResponseDto(updatedClient);
+        if (client.getUser() != null && requestDto.getUser() != null) {
+            User user = client.getUser();
 
-        return new ApiResponse<>("Client mis à jour avec succès", responseDto);
+            if (!user. getUsername().equals(requestDto. getUser().getUsername()) &&
+                    userRepository.existsByUsername(requestDto.getUser().getUsername())) {
+                throw new DuplicateResourceException("User", "username", requestDto.getUser().getUsername());
+            }
+
+            userMapper.updateEntityFromDto(requestDto.getUser(), user);
+            userRepository.save(user);
+        }
+        Client updatedClient = clientRepository.save(client);
+        ClientResponseDto responseDto = clientMapper. toResponseDto(updatedClient);
+
+        return new ApiResponse<>("Client et User mis à jour avec succès", responseDto);
     }
 
     @Transactional
