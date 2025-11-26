@@ -32,4 +32,7 @@ public class User {
     @Column(nullable = false)
     @Builder.Default
     private Boolean active = true;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Client client;
 }
