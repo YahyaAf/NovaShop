@@ -6,12 +6,15 @@ import org.project.novashop.dto.users.UserResponseDto;
 import org.project.novashop.exception.DuplicateResourceException;
 import org.project.novashop.exception.ResourceNotFoundException;
 import org.project.novashop.mapper.UserMapper;
+import org.project.novashop.model.Client;
 import org.project.novashop.model.User;
+import org.project.novashop.repository.ClientRepository;
 import org.project.novashop.repository.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,10 +23,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final ClientRepository clientRepository;
 
-    public UserService(UserRepository userRepository, UserMapper userMapper) {
+    public UserService(UserRepository userRepository, UserMapper userMapper,ClientRepository clientRepository) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.clientRepository = clientRepository;
     }
 
     @Transactional
@@ -99,10 +104,19 @@ public class UserService {
 
     @Transactional
     public ApiResponse<Void> hardDelete(Long id) {
-        if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("User", id);
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User", id));
+
+        Optional<Client> clientOptional = clientRepository.findByUserId(id);
+
+        if (clientOptional.isPresent()) {
+            Client client = clientOptional.get();
+            client.setUser(null);
+            clientRepository.save(client);
         }
-        userRepository.deleteById(id);
+
+        userRepository.delete(user);
+
         return new ApiResponse<>("Utilisateur supprimé définitivement avec succès");
     }
 

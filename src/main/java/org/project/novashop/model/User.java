@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class User {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType. IDENTITY)
     private Long id;
 
     @Column(nullable = false, unique = true)
@@ -33,6 +33,6 @@ public class User {
     @Builder.Default
     private Boolean active = true;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "user")
     private Client client;
 }

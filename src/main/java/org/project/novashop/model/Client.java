@@ -1,10 +1,10 @@
-package org.project.novashop. model;
+package org.project.novashop.model;
 
 import org.project.novashop.enums.CustomerTier;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
+import lombok. AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok. Data;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -30,7 +30,7 @@ public class Client {
     @Builder.Default
     private CustomerTier niveauFidelite = CustomerTier.BASIC;
 
-    @OneToOne(cascade = {CascadeType. PERSIST, CascadeType. MERGE}, orphanRemoval = false)
+    @OneToOne
     @JoinColumn(name = "user_id", nullable = true)
     private User user;
 }
