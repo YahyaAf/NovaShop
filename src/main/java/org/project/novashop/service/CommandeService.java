@@ -96,6 +96,12 @@ public class CommandeService {
         }
         commande.setOrderItems(orderItems);
 
+        for (OrderItem item : orderItems) {
+            Product product = item.getProduct();
+            product.setStock(product.getStock() - item.getQuantite());
+            productRepository.save(product);
+        }
+
         if (requestDto.getCodePromo() != null && ! requestDto.getCodePromo(). isEmpty()) {
             promoRepository.findByCode(requestDto.getCodePromo()). ifPresent(promo -> {
                 if (promo.getUsageCount() < promo.getMaxUsage()) {
@@ -152,6 +158,12 @@ public class CommandeService {
 
         if (commande.getStatut() == OrderStatus.CONFIRMED) {
             throw new IllegalArgumentException("Impossible d'annuler une commande déjà confirmée");
+        }
+
+        for (OrderItem item : commande.getOrderItems()) {
+            Product product = item.getProduct();
+            product.setStock(product.getStock() + item.getQuantite());
+            productRepository. save(product);
         }
 
         commande.setStatut(OrderStatus.CANCELED);
