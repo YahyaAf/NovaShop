@@ -41,13 +41,11 @@ public class CommandeController {
     public ResponseEntity<ApiResponse<CommandeResponseDto>> create(
             @Valid @RequestBody CommandeRequestDto requestDto,
             HttpServletRequest request) {
-        User user = authService. getAuthenticatedUser(request);
 
-        Client client = clientRepository.findByUserId(user.getId())
-                .orElseThrow(() -> new ResourceNotFoundException("Client", "userId", user.getId(). toString()));
+        authService.getAuthenticatedUser(request);
 
-        ApiResponse<CommandeResponseDto> response = commandeService.create(client. getId(), requestDto);
-        return ResponseEntity.status(HttpStatus. CREATED).body(response);
+        ApiResponse<CommandeResponseDto> response = commandeService.create(requestDto.getClientId(), requestDto);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PutMapping("/{id}/confirm")

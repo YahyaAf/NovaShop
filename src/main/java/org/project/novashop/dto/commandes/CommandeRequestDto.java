@@ -2,6 +2,7 @@ package org.project.novashop.dto.commandes;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +16,9 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 public class CommandeRequestDto {
+
+    @NotNull(message = "L'ID du client est requis")
+    private Long clientId;
 
     @NotEmpty(message = "La commande doit contenir au moins un produit")
     @Valid
