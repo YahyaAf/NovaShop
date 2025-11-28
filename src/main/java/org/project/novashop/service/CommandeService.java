@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Service
@@ -168,6 +167,15 @@ public class CommandeService {
 
         CommandeResponseDto responseDto = commandeMapper.toResponseDto(commande);
         return new ApiResponse<>("Commande récupérée avec succès", responseDto);
+    }
+
+    public ApiResponse<List<CommandeResponseDto>> findAll() {
+        List<Commande> commandes = commandeRepository. findAll();
+        List<CommandeResponseDto> responseDtos = commandes.stream()
+                .map(commandeMapper::toResponseDto)
+                .collect(Collectors.toList());
+
+        return new ApiResponse<>("Toutes les commandes récupérées avec succès", responseDtos);
     }
 
     public ApiResponse<List<CommandeResponseDto>> findByClient(Long clientId) {
