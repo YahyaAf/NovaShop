@@ -1,8 +1,13 @@
 package org.project.novashop.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.project.novashop.dto.api.ApiResponse;
+import org.project.novashop.dto.auth.LoginResponseDto;
 import org.project.novashop. dto.clients.ClientRequestDto;
 import org.project.novashop.dto.clients.ClientResponseDto;
+import org.project.novashop.dto.clients.ClientStatsDto;
+import org.project.novashop.model.User;
+import org.project.novashop.service.AuthenticationService;
 import org.project. novashop.service.ClientService;
 import org.springframework.http.HttpStatus;
 import org. springframework.http.ResponseEntity;
@@ -18,9 +23,11 @@ import java.util.List;
 public class ClientController {
 
     private final ClientService clientService;
+    private final AuthenticationService authenticationService;
 
-    public ClientController(ClientService clientService) {
+    public ClientController(ClientService clientService,AuthenticationService authenticationService) {
         this.clientService = clientService;
+        this.authenticationService = authenticationService;
     }
 
     @PostMapping
@@ -72,6 +79,13 @@ public class ClientController {
     @GetMapping("/count")
     public ResponseEntity<ApiResponse<Long>> count() {
         ApiResponse<Long> response = clientService.count();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me/stats")
+    public ResponseEntity<ApiResponse<ClientStatsDto>> getMyClientStats(HttpServletRequest request) {
+        ApiResponse<LoginResponseDto> user = authenticationService.getCurrentUser(request);
+        ApiResponse<ClientStatsDto> response = clientService.getClientStats(user.getData().getUserId());
         return ResponseEntity.ok(response);
     }
 }
