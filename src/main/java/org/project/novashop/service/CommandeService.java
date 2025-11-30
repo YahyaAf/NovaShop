@@ -50,45 +50,45 @@ public class CommandeService {
 
         List<OrderItem> orderItems = new ArrayList<>();
         double sousTotalHt = 0.0;
+        boolean stockOk = true;
+        String rejectedReason = "";
 
         for (OrderItemRequestDto itemDto : requestDto.getItems()) {
             Product product = productRepository.findByIdAndDeletedFalse(itemDto.getProductId())
                     .orElseThrow(() -> new ResourceNotFoundException("Product", itemDto.getProductId()));
 
-            // Vérifier stock
             if (product.getStock() < itemDto.getQuantite()) {
-                throw new IllegalArgumentException(
-                        "Stock insuffisant pour " + product.getNom() +
-                                ". Disponible: " + product.getStock() + ", Demandé: " + itemDto.getQuantite()
-                );
+                stockOk = false;
+                rejectedReason = "Stock insuffisant pour " + product.getNom() +
+                        ". Disponible: " + product.getStock() + ", Demandé: " + itemDto.getQuantite();
             }
 
-            // Créer OrderItem
-            double totalLigne = product.getPrixUnitaire() * itemDto. getQuantite();
+            double totalLigne = product.getPrixUnitaire() * itemDto.getQuantite();
             OrderItem orderItem = OrderItem.builder()
-                    . product(product)
+                    .product(product)
                     .quantite(itemDto.getQuantite())
                     .prixUnitaire(product.getPrixUnitaire())
                     .totalLigne(totalLigne)
                     .build();
-
             orderItems.add(orderItem);
             sousTotalHt += totalLigne;
         }
 
         CommandeCalculationDto calculation = calculateRemises(client, sousTotalHt, requestDto.getCodePromo());
 
+        OrderStatus statut = stockOk ? OrderStatus.PENDING : OrderStatus.REJECTED;
+
         Commande commande = Commande.builder()
-                . numeroCommande(generateNumeroCommande())
+                .numeroCommande(generateNumeroCommande())
                 .dateCreation(LocalDateTime.now())
                 .client(client)
                 .sousTotalHt(calculation.getSousTotalHt())
                 .montantRemise(calculation.getMontantRemiseTotal())
                 .tva(calculation.getMontantTva())
-                . totalTTC(calculation.getTotalTTC())
+                .totalTTC(calculation.getTotalTTC())
                 .codePromo(requestDto.getCodePromo())
                 .montantRestant(calculation.getTotalTTC())
-                .statut(OrderStatus.PENDING)
+                .statut(statut)
                 .build();
 
         for (OrderItem orderItem : orderItems) {
@@ -96,14 +96,16 @@ public class CommandeService {
         }
         commande.setOrderItems(orderItems);
 
-        for (OrderItem item : orderItems) {
-            Product product = item.getProduct();
-            product.setStock(product.getStock() - item.getQuantite());
-            productRepository.save(product);
+        if (stockOk) {
+            for (OrderItem item : orderItems) {
+                Product product = item.getProduct();
+                product.setStock(product.getStock() - item.getQuantite());
+                productRepository.save(product);
+            }
         }
 
-        if (requestDto.getCodePromo() != null && ! requestDto.getCodePromo(). isEmpty()) {
-            promoRepository.findByCode(requestDto.getCodePromo()). ifPresent(promo -> {
+        if (requestDto.getCodePromo() != null && !requestDto.getCodePromo().isEmpty()) {
+            promoRepository.findByCode(requestDto.getCodePromo()).ifPresent(promo -> {
                 if (promo.getUsageCount() < promo.getMaxUsage()) {
                     promo.setUsageCount(promo.getUsageCount() + 1);
                     promoRepository.save(promo);
@@ -119,7 +121,15 @@ public class CommandeService {
         responseDto.setMontantRemisePromo(calculation.getMontantRemisePromo());
         responseDto.setMontantHtApresRemise(calculation.getMontantHtApresRemise());
 
-        return new ApiResponse<>("Commande créée avec succès", responseDto);
+        String message = stockOk
+                ? "Commande créée avec succès"
+                : "Commande rejetée: " + rejectedReason;
+
+        if(!stockOk){
+            return new ApiResponse<>(message);
+        }
+
+        return new ApiResponse<>(message, responseDto);
     }
 
     @Transactional
