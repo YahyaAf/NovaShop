@@ -24,7 +24,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     List<Payment> findByCommandeIdAndTypePaiement(Long commandeId, PaymentType typePaiement);
 
-    @Query("SELECT COALESCE(SUM(p.montant), 0. 0) FROM Payment p " +
+    @Query("SELECT COALESCE(SUM(p.montant), 0.0) FROM Payment p " +
             "WHERE p.commande.id = :commandeId AND p.statut = 'ENCAISSE'")
     Double calculateTotalEncaisseByCommande(@Param("commandeId") Long commandeId);
 

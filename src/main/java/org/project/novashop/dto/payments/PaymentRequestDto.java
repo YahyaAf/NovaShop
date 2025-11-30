@@ -19,7 +19,7 @@ public class PaymentRequestDto {
     private Long commandeId;
 
     @NotNull(message = "Le montant est requis")
-    @DecimalMin(value = "0. 01", message = "Le montant doit être supérieur à 0")
+    @DecimalMin(value = "0.01", message = "Le montant doit être supérieur à 0")
     private Double montant;
 
     @NotNull(message = "Le type de paiement est requis")
