@@ -131,21 +131,21 @@ public class CommandeService {
             throw new IllegalArgumentException("Seules les commandes en attente peuvent être confirmées");
         }
 
-        for (OrderItem item : commande.getOrderItems()) {
-            Product product = item. getProduct();
-            product.setStock(product.getStock() - item.getQuantite());
-            productRepository.save(product);
+        if (commande.getMontantRestant() > 0) {
+            throw new IllegalArgumentException(
+                    "Impossible de confirmer la commande. Montant restant à payer: " +
+                            commande.getMontantRestant() + " DH"
+            );
         }
 
-        Client client = commande. getClient();
+        Client client = commande.getClient();
         client.setTotalOrders(client.getTotalOrders() + 1);
         client.setTotalSpent(client.getTotalSpent() + commande.getTotalTTC());
-
         updateClientTier(client);
         clientRepository.save(client);
 
         commande.setStatut(OrderStatus.CONFIRMED);
-        Commande updatedCommande = commandeRepository. save(commande);
+        Commande updatedCommande = commandeRepository.save(commande);
 
         CommandeResponseDto responseDto = commandeMapper.toResponseDto(updatedCommande);
         return new ApiResponse<>("Commande confirmée avec succès", responseDto);
@@ -160,10 +160,22 @@ public class CommandeService {
             throw new IllegalArgumentException("Impossible d'annuler une commande déjà confirmée");
         }
 
+        if (commande.getPayments() != null && !commande.getPayments().isEmpty()) {
+            double totalPaye = commande.getPayments().stream()
+                    .mapToDouble(Payment::getMontant)
+                    .sum();
+
+            if (totalPaye > 0) {
+                throw new IllegalArgumentException(
+                        "Impossible d'annuler la commande. Des paiements ont été réalisés."
+                );
+            }
+        }
+
         for (OrderItem item : commande.getOrderItems()) {
             Product product = item.getProduct();
             product.setStock(product.getStock() + item.getQuantite());
-            productRepository. save(product);
+            productRepository.save(product);
         }
 
         commande.setStatut(OrderStatus.CANCELED);
