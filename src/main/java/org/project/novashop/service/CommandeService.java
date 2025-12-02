@@ -116,11 +116,6 @@ public class CommandeService {
 
         Commande savedCommande = commandeRepository.save(commande);
 
-        CommandeResponseDto responseDto = commandeMapper.toResponseDto(savedCommande);
-        responseDto.setMontantRemiseFidelite(calculation.getMontantRemiseFidelite());
-        responseDto.setMontantRemisePromo(calculation.getMontantRemisePromo());
-        responseDto.setMontantHtApresRemise(calculation.getMontantHtApresRemise());
-
         String message = stockOk
                 ? "Commande créée avec succès"
                 : "Commande rejetée: " + rejectedReason;
@@ -128,6 +123,11 @@ public class CommandeService {
         if(!stockOk){
             return new ApiResponse<>(message);
         }
+
+        CommandeResponseDto responseDto = commandeMapper.toResponseDto(savedCommande);
+        responseDto.setMontantRemiseFidelite(calculation.getMontantRemiseFidelite());
+        responseDto.setMontantRemisePromo(calculation.getMontantRemisePromo());
+        responseDto.setMontantHtApresRemise(calculation.getMontantHtApresRemise());
 
         return new ApiResponse<>(message, responseDto);
     }
