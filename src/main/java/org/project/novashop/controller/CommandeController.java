@@ -1,19 +1,19 @@
 package org.project.novashop.controller;
 
-import org. project.novashop.dto.api.ApiResponse;
-import org.project. novashop.dto.commandes.CommandeRequestDto;
-import org.project. novashop.dto.commandes.CommandeResponseDto;
-import org.project.novashop. model.Client;
+import org.project.novashop.dto.api.ApiResponse;
+import org.project.novashop.dto.commandes.CommandeRequestDto;
+import org.project.novashop.dto.commandes.CommandeResponseDto;
 import org.project.novashop.enums.OrderStatus;
+import org.project.novashop.exception.ResourceNotFoundException;
+import org.project.novashop.model.Client;
 import org.project.novashop.model.User;
 import org.project.novashop.repository.ClientRepository;
-import org. project.novashop.service.AuthenticationService;
-import org.project. novashop.service.CommandeService;
-import org.project. novashop.exception.ResourceNotFoundException;
-import org. springframework.http.HttpStatus;
-import org. springframework.http.ResponseEntity;
+import org.project.novashop.service.CommandeService;
+import org.project.novashop.service.PermissionService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind. annotation.*;
+import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -26,14 +26,14 @@ import java.util.List;
 public class CommandeController {
 
     private final CommandeService commandeService;
-    private final AuthenticationService authService;
+    private final PermissionService permissionService;
     private final ClientRepository clientRepository;
 
     public CommandeController(CommandeService commandeService,
-                              AuthenticationService authService,
+                              PermissionService permissionService,
                               ClientRepository clientRepository) {
         this.commandeService = commandeService;
-        this.authService = authService;
+        this.permissionService = permissionService;
         this.clientRepository = clientRepository;
     }
 
@@ -41,8 +41,7 @@ public class CommandeController {
     public ResponseEntity<ApiResponse<CommandeResponseDto>> create(
             @Valid @RequestBody CommandeRequestDto requestDto,
             HttpServletRequest request) {
-
-        authService.getAuthenticatedUser(request);
+        permissionService.requireAdmin(request);
 
         ApiResponse<CommandeResponseDto> response = commandeService.create(requestDto.getClientId(), requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -52,7 +51,7 @@ public class CommandeController {
     public ResponseEntity<ApiResponse<CommandeResponseDto>> confirm(
             @PathVariable Long id,
             HttpServletRequest request) {
-        authService.getAuthenticatedUser(request);
+        permissionService.requireAdmin(request);
 
         ApiResponse<CommandeResponseDto> response = commandeService.confirm(id);
         return ResponseEntity.ok(response);
@@ -62,7 +61,7 @@ public class CommandeController {
     public ResponseEntity<ApiResponse<CommandeResponseDto>> cancel(
             @PathVariable Long id,
             HttpServletRequest request) {
-        authService.getAuthenticatedUser(request);
+        permissionService.requireAdmin(request);
 
         ApiResponse<CommandeResponseDto> response = commandeService.cancel(id);
         return ResponseEntity.ok(response);
@@ -72,7 +71,8 @@ public class CommandeController {
     public ResponseEntity<ApiResponse<CommandeResponseDto>> findById(
             @PathVariable Long id,
             HttpServletRequest request) {
-        User user = authService.getAuthenticatedUser(request);
+        permissionService.requireAdmin(request);
+
         ApiResponse<CommandeResponseDto> response = commandeService.findById(id);
         return ResponseEntity.ok(response);
     }
@@ -80,7 +80,7 @@ public class CommandeController {
     @GetMapping("/mes-commandes")
     public ResponseEntity<ApiResponse<List<CommandeResponseDto>>> getMesCommandes(
             HttpServletRequest request) {
-        User user = authService.getAuthenticatedUser(request);
+        User user = permissionService.getAuthenticatedUser(request);
 
         Client client = clientRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Client", "userId", user.getId().toString()));
@@ -93,7 +93,7 @@ public class CommandeController {
     public ResponseEntity<ApiResponse<List<CommandeResponseDto>>> getCommandesByClient(
             @PathVariable Long clientId,
             HttpServletRequest request) {
-        authService.getAuthenticatedUser(request);
+        permissionService.requireAdmin(request);
 
         ApiResponse<List<CommandeResponseDto>> response = commandeService.findByClient(clientId);
         return ResponseEntity.ok(response);
@@ -103,7 +103,7 @@ public class CommandeController {
     public ResponseEntity<ApiResponse<List<CommandeResponseDto>>> getCommandesByStatus(
             @PathVariable OrderStatus status,
             HttpServletRequest request) {
-        authService.getAuthenticatedUser(request);
+        permissionService.requireAdmin(request);
 
         ApiResponse<List<CommandeResponseDto>> response = commandeService.findByStatus(status);
         return ResponseEntity.ok(response);
@@ -112,7 +112,7 @@ public class CommandeController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<CommandeResponseDto>>> getAllCommandes(
             HttpServletRequest request) {
-        authService.getAuthenticatedUser(request);
+        permissionService.requireAdmin(request);
 
         ApiResponse<List<CommandeResponseDto>> response = commandeService.findAll();
         return ResponseEntity.ok(response);
