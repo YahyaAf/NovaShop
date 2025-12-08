@@ -157,7 +157,7 @@ class CommandeServiceTest {
         assertThat(response.getMessage()).isEqualTo("Commande confirmée avec succès");
         assertThat(response.getData().getStatut()).isEqualTo(OrderStatus.CONFIRMED);
         verify(clientRepository).save(any(Client.class));
-        verify(commandeRepository).save(any(Commande.class)); // CHANGE from times(2) to just once!
+        verify(commandeRepository).save(any(Commande.class));
     }
 
     @Test

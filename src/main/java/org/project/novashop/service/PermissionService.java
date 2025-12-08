@@ -30,24 +30,4 @@ public class PermissionService {
             throw new AccessDeniedException("Accès interdit. Privilèges ADMIN requis.");
         }
     }
-
-    public void requireClient(HttpServletRequest request) {
-        User user = getAuthenticatedUser(request);
-        if (user.getRole() != UserRole.CLIENT) {
-            throw new AccessDeniedException("Accès interdit. Espace client uniquement.");
-        }
-    }
-
-    public void requireClientOwnershipOrAdmin(HttpServletRequest request, Long resourceClientId) {
-        User user = getAuthenticatedUser(request);
-
-        if (user.getRole() == UserRole.ADMIN) return;
-
-        if (user.getRole() == UserRole.CLIENT) {
-            Long clientId = user.getClient() != null ? user.getClient().getId() : null;
-            if (clientId == null || !clientId.equals(resourceClientId)) {
-                throw new AccessDeniedException("Accès interdit. Vous ne pouvez accéder qu'à vos propres données.");
-            }
-        }
-    }
 }
