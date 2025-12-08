@@ -4,6 +4,7 @@ import org.project.novashop.dto.api.ApiResponse;
 import org.project. novashop.dto.auth. LoginRequestDto;
 import org. project.novashop.dto. auth.LoginResponseDto;
 import org.project.novashop. exception.ResourceNotFoundException;
+import org.project.novashop.exception.UnauthorizedException;
 import org. project.novashop.model.User;
 import org.project.novashop.repository.UserRepository;
 import org.springframework.stereotype.Service;
@@ -79,13 +80,13 @@ public class AuthenticationService {
         HttpSession session = request.getSession(false);
 
         if (session == null) {
-            throw new IllegalArgumentException("Non authentifié.  Veuillez vous connecter.");
+            throw new UnauthorizedException("Non authentifié.  Veuillez vous connecter.");
         }
 
         Long userId = (Long) session.getAttribute(USER_SESSION_KEY);
 
         if (userId == null) {
-            throw new IllegalArgumentException("Non authentifié. Veuillez vous connecter.");
+            throw new UnauthorizedException("Non authentifié. Veuillez vous connecter.");
         }
 
         User user = userRepository.findById(userId)
