@@ -3,6 +3,7 @@ package org.project.novashop.service;
 import org.project.novashop.dto.api.ApiResponse;
 import org.project. novashop.dto.auth. LoginRequestDto;
 import org. project.novashop.dto. auth.LoginResponseDto;
+import org.project.novashop.exception.BusinessRuleException;
 import org.project.novashop. exception.ResourceNotFoundException;
 import org.project.novashop.exception.UnauthorizedException;
 import org. project.novashop.model.User;
@@ -94,22 +95,9 @@ public class AuthenticationService {
 
         if (!user.getActive()) {
             session.invalidate();
-            throw new IllegalArgumentException("Compte désactivé");
+            throw new BusinessRuleException("Compte désactivé");
         }
 
         return user;
-    }
-
-    public boolean isAuthenticated(HttpServletRequest request) {
-        try {
-            getAuthenticatedUser(request);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public Long getAuthenticatedUserId(HttpServletRequest request) {
-        return getAuthenticatedUser(request).getId();
     }
 }
