@@ -2,6 +2,8 @@ package org.project.novashop. repository;
 
 import org.project. novashop.model.Commande;
 import org.project. novashop.enums.OrderStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository. JpaRepository;
 import org. springframework.stereotype.Repository;
 
@@ -24,4 +26,6 @@ public interface CommandeRepository extends JpaRepository<Commande, Long> {
     long countByClientId(Long clientId);
 
     long countByClientIdAndStatut(Long clientId, OrderStatus statut);
+
+    Page<Commande> findAll(Pageable pageable);
 }

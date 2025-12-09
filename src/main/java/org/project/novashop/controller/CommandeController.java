@@ -10,6 +10,8 @@ import org.project.novashop.model.User;
 import org.project.novashop.repository.ClientRepository;
 import org.project.novashop.service.CommandeService;
 import org.project.novashop.service.PermissionService;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -111,10 +113,12 @@ public class CommandeController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<CommandeResponseDto>>> getAllCommandes(
+            @RequestParam int min,
+            @RequestParam int size,
             HttpServletRequest request) {
         permissionService.requireAdmin(request);
-
-        ApiResponse<List<CommandeResponseDto>> response = commandeService.findAll();
+        Pageable page = PageRequest.of(min,size);
+        ApiResponse<List<CommandeResponseDto>> response = commandeService.findAll(page);
         return ResponseEntity.ok(response);
     }
 }

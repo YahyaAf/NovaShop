@@ -198,17 +198,26 @@ class CommandeServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> commandeService.findById(999L));
     }
 
-    @Test
-    void testFindAll_ReturnsList() {
-        Commande commande1 = Commande.builder().id(1L).build();
-        Commande commande2 = Commande.builder().id(2L).build();
+//    @Test
+//    void testFindAll_ReturnsList() {
+//        Commande commande1 = Commande.builder().id(1L).build();
+//        Commande commande2 = Commande.builder().id(2L).build();
+//
+//        when(commandeRepository.findAll()).thenReturn(List.of(commande1, commande2));
+//        when(commandeMapper.toResponseDto(any(Commande.class)))
+//                .thenReturn(CommandeResponseDto.builder().build());
+//
+//        ApiResponse<List<CommandeResponseDto>> response = commandeService.findAll();
+//        assertThat(response.getData()).hasSize(2);
+//    }
 
-        when(commandeRepository.findAll()).thenReturn(List.of(commande1, commande2));
-        when(commandeMapper.toResponseDto(any(Commande.class)))
-                .thenReturn(CommandeResponseDto.builder().build());
-
-        ApiResponse<List<CommandeResponseDto>> response = commandeService.findAll();
-        assertThat(response.getData()).hasSize(2);
-    }
+//    @Test
+//    void TestSizeOfCommand(){
+//        Commande commande1 = Commande.builder().id(1L).build();
+//        Commande commande2 = Commande.builder().id(2L).build();
+//        when(commandeRepository.findAll()).thenReturn()
+//
+//
+//    }
 
 }

@@ -8,6 +8,8 @@ import org.project.novashop.exception.ResourceNotFoundException;
 import org. project.novashop.mapper.CommandeMapper;
 import org.project.novashop.model.*;
 import org.project.novashop.repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -203,8 +205,8 @@ public class CommandeService {
         return new ApiResponse<>("Commande récupérée avec succès", responseDto);
     }
 
-    public ApiResponse<List<CommandeResponseDto>> findAll() {
-        List<Commande> commandes = commandeRepository. findAll();
+    public ApiResponse<List<CommandeResponseDto>> findAll(Pageable pageable) {
+        Page<Commande> commandes = commandeRepository. findAll(pageable);
         List<CommandeResponseDto> responseDtos = commandes.stream()
                 .map(commandeMapper::toResponseDto)
                 .collect(Collectors.toList());
@@ -318,4 +320,5 @@ public class CommandeService {
         } while (commandeRepository.existsByNumeroCommande(uniqueId));
         return uniqueId;
     }
+
 }
