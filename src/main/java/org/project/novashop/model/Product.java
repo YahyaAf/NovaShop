@@ -38,6 +38,4 @@ public class Product {
     @Builder.Default
     private Boolean deleted = false;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<OrderItem> orderItems = new ArrayList<>();
 }
