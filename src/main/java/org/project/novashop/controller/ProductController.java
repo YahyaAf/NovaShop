@@ -18,6 +18,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/products")
 @Validated
@@ -83,7 +85,6 @@ public class ProductController {
         ApiResponse<Page<ProductResponseDto>> response = productService.findAllWithFilters(
                 nom, minPrice, maxPrice, inStock, pageable
         );
-
         return ResponseEntity.ok(response);
     }
 
@@ -94,6 +95,14 @@ public class ProductController {
         permissionService.requireAdmin(request);
 
         ApiResponse<ProductResponseDto> response = productService.findById(id);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<ProductResponseDto>>> findAll(HttpServletRequest request) {
+        permissionService.requireAdmin(request);
+
+        ApiResponse<List<ProductResponseDto>> response = productService.findAll();
         return ResponseEntity.ok(response);
     }
 }

@@ -1,6 +1,7 @@
 package org. project.novashop.service;
 
 import org.project.novashop.dto.api.ApiResponse;
+import org.project.novashop.dto.commandes.CommandeResponseDto;
 import org.project. novashop.dto.products.ProductRequestDto;
 import org.project. novashop.dto.products. ProductResponseDto;
 import org. project.novashop.exception. DuplicateResourceException;
@@ -12,6 +13,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain. Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation. Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -72,11 +76,21 @@ public class ProductService {
             Boolean inStock,
             Pageable pageable) {
 
-        Page<Product> products = productRepository. findAllWithFilters(
+        Page<Product> products = productRepository.findAllWithFilters(
                 nom, minPrice, maxPrice, inStock, pageable
         );
 
         Page<ProductResponseDto> responsePage = products.map(productMapper::toResponseDto);
+
+        return new ApiResponse<>("Liste des produits récupérée avec succès", responsePage);
+    }
+
+    public ApiResponse<List<ProductResponseDto>> findAll() {
+
+        List<Product> products = productRepository.findAll();
+
+        List<ProductResponseDto> responsePage = products.stream().map(productMapper::toResponseDto).toList();
+
 
         return new ApiResponse<>("Liste des produits récupérée avec succès", responsePage);
     }
